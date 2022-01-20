@@ -20,4 +20,12 @@ information, but it was straightforward and kept the implementation consistent.
 Rather than add the text replacement code into the new script, the existing
 Pywikibot replace.py was used. A Bash script coordinates the two Pywikibot scripts.
 
+This respository is just a place to stuff files so they don't exist only on my
+laptop. It isn't a ready-to-pull-and-run project.
+
+I performed local testing on a local wiki created via mwcli:
+  https://www.mediawiki.org/wiki/Cli
+I therefore had a core/pywikibot/families/mwcli_family.py file, which I referenced
+in core/user-config.py.  
+
 This is an experimental proof-of-concept and is unsuited for production use.

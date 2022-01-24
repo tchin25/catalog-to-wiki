@@ -1,3 +1,5 @@
 mylang = 'en'
-family = 'mwcli'
-usernames['mwcli']['en'] = 'admin'
+#family = 'mwcli'
+family = 'api'
+#usernames['mwcli']['en'] = 'admin'
+usernames['api']['en'] = 'BPirkle (WMF)'

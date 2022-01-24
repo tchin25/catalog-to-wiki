@@ -39,7 +39,7 @@ def parseCatalogJson(catalogJson):
 # makes a single field entry string for use in api wikitext
 # ===========================================================
 def makeFieldWikitext(name, value):
-	return name + ': ' + value + '<br>'
+	return name + ': ' + value.replace('\n', '<br>') + '<br>'
 
 # ===========================================================
 # converts a single api object to wikitext
@@ -69,6 +69,8 @@ def convertCatalogToWikitext(catalogInfo):
 # prepares the pairsfile contents
 # ===========================================================
 def makePairsfileContents(wikitext):
+	# First line is the search string
+	# Second line is the replacement string
 	contents = PAIRSFILE_REGEX + '\n'
 	contents += '<!-- BEGIN API LIST -->'
 	contents += wikitext
@@ -81,12 +83,13 @@ def makePairsfileContents(wikitext):
 def savePairsfile(wikitext):
 	with open(OUTPUT_FILE, 'w') as result_file:
 		result_file.write(wikitext)
+		result_file.close();
 
 # ===========================================================
 # main script routine
 # ===========================================================
 def main():
-	pywikibot.output('------- begin bdp_test_one.py -------');
+	pywikibot.output('------- begin make_catalog_pairsfile.py -------');
 
 	catalogJson = fetchCatalogJson()
 	catalogInfo = parseCatalogJson(catalogJson)
@@ -94,7 +97,7 @@ def main():
 	contents = makePairsfileContents(catalogWikitext)
 	savePairsfile(contents);
 
-	pywikibot.output('------- end bdp_test_one.py -------');
+	pywikibot.output('------- end make_catalog_pairsfile.py -------');
 
 # ===========================================================
 #  script entry point

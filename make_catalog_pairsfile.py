@@ -11,6 +11,7 @@
 
 import json
 import pywikibot
+from string import Template
 from pywikibot.comms import http
 # from pywikibot import pagegenerators, textlib
 
@@ -36,34 +37,77 @@ def parseCatalogJson(catalogJson):
 	return json.loads(catalogJson)
 
 # ===========================================================
-# makes a single field entry string for use in api wikitext
+# creates a styled card
 # ===========================================================
-def makeFieldWikitext(name, value):
-	return name + ': ' + value.replace('\n', '<br>') + '<br>'
-
+def createCard(title, tag, description, link):
+	return Template(
+	'''
+ 	<div class="col-sm">
+	<div class="card" style="background: #f8f9fa; border: 1px solid #eaecf0; min-height:180px;">
+	<div class="card-body">
+	<p class="card-title" style="font-weight:600;">$title</p>
+	{{Tag|$tag}}
+	<p class="card-text" style="font-size: 14px;">$description</p>
+	<p class="card-text" style="font-size: 14px;">[$link Read the docs]</p>
+	</div>
+	</div>
+	</div>
+	'''
+	).substitute({
+		'title': title,
+		'tag': tag,
+		'description': description,
+		'link': link
+	})
+ 
 # ===========================================================
-# converts a single api object to wikitext
+# creates a formatted row
 # ===========================================================
-def convertApiToWikitext(apiInfo):
-	wikitext = '<li>'
-	wikitext += makeFieldWikitext('Name', apiInfo['metadata']['name'])
-	wikitext += makeFieldWikitext('Description', apiInfo['metadata']['description'])
-	wikitext += makeFieldWikitext('Link', apiInfo['metadata']['annotations']['backstage.io/view-url'])
-	for relation in apiInfo['relations']:
-		if relation['type'] == 'ownedBy':
-			wikitext += makeFieldWikitext('Owner:', relation['target']['name'])
-	wikitext += '</li><br>'		
+def createRow(apiCards):
+	wikitext = '<div class="row" style="padding-top:20px;">'
+	for apiCard in apiCards:
+		wikitext += createCard(**apiCard)
+	wikitext += '</div>'
 	return wikitext
 
 # ===========================================================
-# converts the catalog object to wikitext
+# wraps wikitext in a div container
 # ===========================================================
-def convertCatalogToWikitext(catalogInfo):
-	wikitext = '<ul>'
-	for api in catalogInfo:
-		wikitext += convertApiToWikitext(api)
-	wikitext += '</ul>'	
-	return wikitext	
+def createContainer(wikitext):
+    return '<div class="container">{0}</div>'.format(wikitext)
+ 
+# ===========================================================
+# extracts wanted properties of each api from catalog JSON
+# and puts it in a dict array
+# ===========================================================
+def extractApiInfo(catalogObject):
+	apiCards = []
+	for apiInfo in catalogObject:
+		apiCard = {
+			'title': apiInfo['metadata']['name'],
+			'description': apiInfo['metadata']['description'],
+			'tag': apiInfo['spec']['lifecycle'],
+			'link': apiInfo['metadata']['annotations']['backstage.io/view-url']
+		}
+		apiCards += [apiCard]
+	return apiCards
+
+# ===========================================================
+# prepares the pairsfile contents
+# formatted into rows of 3 cards
+# ===========================================================
+def generateApiWikitext(catalogObject):
+    apiCards = extractApiInfo(catalogObject)
+    wikitext = ''
+    for apiRow in chunks(apiCards, 3):
+        wikitext += createRow(apiRow)
+    wikitext = createContainer(wikitext)
+    return wikitext
+    
+def chunks(lst, n):
+    """Yield successive n-sized chunks from lst."""
+    for i in range(0, len(lst), n):
+        yield lst[i:i + n]
 
 # ===========================================================
 # prepares the pairsfile contents
@@ -93,8 +137,9 @@ def main():
 
 	catalogJson = fetchCatalogJson()
 	catalogInfo = parseCatalogJson(catalogJson)
-	catalogWikitext = convertCatalogToWikitext(catalogInfo)
-	contents = makePairsfileContents(catalogWikitext)
+	# catalogWikitext = convertCatalogToWikitext(catalogInfo)
+	catalogWikitext = generateApiWikitext(catalogInfo)
+	contents = makePairsfileContents(catalogWikitext.replace('\n',' '))
 	savePairsfile(contents);
 
 	pywikibot.output('------- end make_catalog_pairsfile.py -------');

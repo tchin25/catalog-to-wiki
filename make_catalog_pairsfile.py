@@ -43,7 +43,7 @@ def createCard(title, tag, description, link):
 	return Template(
 	'''
  	<div class="col-sm">
-	<div class="card" style="background: #f8f9fa; border: 1px solid #eaecf0; min-height:180px;">
+	<div class="card" style="background: #f8f9fa; border: 1px solid #eaecf0; min-height:180px; height: 100%">
 	<div class="card-body">
 	<p class="card-title" style="font-weight:600;">$title</p>
 	{{Tag|$tag}}
@@ -89,12 +89,15 @@ def extractApiInfo(catalogObject):
 	apiCards = []
 	for apiInfo in catalogObject:
 		apiCards += [{
-			'title': apiInfo.get('metadata', {}).get('name', ''),
+			'title': transformTitle( apiInfo.get('metadata', {}).get('name', '') ),
 			'description': apiInfo.get('metadata', {}).get('description', ''),
 			'tag': apiInfo.get('spec', {}).get('lifecycle', ''),
 			'link': apiInfo.get('metadata', {}).get('links', [{}])[0].get('url', '')
 		}]
 	return apiCards
+
+def transformTitle(title):
+    return title.replace('-', ' ').title()
 
 # ===========================================================
 # prepares the pairsfile contents

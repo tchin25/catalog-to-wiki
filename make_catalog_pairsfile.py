@@ -89,10 +89,10 @@ def extractApiInfo(catalogObject):
 	apiCards = []
 	for apiInfo in catalogObject:
 		apiCards += [{
-			'title': apiInfo['metadata']['name'],
-			'description': apiInfo['metadata']['description'],
-			'tag': apiInfo['spec']['lifecycle'],
-			'link': apiInfo['metadata']['links'][0]['url']
+			'title': apiInfo.get('metadata', {}).get('name', ''),
+			'description': apiInfo.get('metadata', {}).get('description', ''),
+			'tag': apiInfo.get('spec', {}).get('lifecycle', ''),
+			'link': apiInfo.get('metadata', {}).get('links', [{}])[0].get('url', '')
 		}]
 	return apiCards
 

@@ -47,7 +47,12 @@ def createCard(title, tag, description, link):
 	<div class="card-body">
 	<p class="card-title" style="font-weight:600;">$title</p>
 	{{Tag|$tag}}
-	<p class="card-text" style="font-size: 14px;">$description</p>
+	<p class="card-text" style="font-size: 14px;
+	overflow: hidden;
+	display: -webkit-box;
+	-webkit-line-clamp: 2;
+	-webkit-box-orient: vertical;
+ 	">$description</p>
 	<p class="card-text" style="font-size: 14px;">[$link Read the docs]</p>
 	</div>
 	</div>
@@ -83,13 +88,12 @@ def createContainer(wikitext):
 def extractApiInfo(catalogObject):
 	apiCards = []
 	for apiInfo in catalogObject:
-		apiCard = {
+		apiCards += [{
 			'title': apiInfo['metadata']['name'],
 			'description': apiInfo['metadata']['description'],
 			'tag': apiInfo['spec']['lifecycle'],
-			'link': apiInfo['metadata']['annotations']['backstage.io/view-url']
-		}
-		apiCards += [apiCard]
+			'link': apiInfo['metadata']['links'][0]['url']
+		}]
 	return apiCards
 
 # ===========================================================

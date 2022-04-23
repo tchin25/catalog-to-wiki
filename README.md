@@ -1,4 +1,7 @@
 # catalog-to-wiki
+
+This repo has been manually moved to the [Wikimedia Foundation's Gitlab instance](https://gitlab.wikimedia.org/repos/api-platform/catalog-to-wiki). Future updates will be made there.
+
 Scripts for updating an on-wiki API catalog based on Backstage data
 
 Context:
